@@ -20,7 +20,7 @@ def resource_handler(event, context):
         event['ResourceProperties']['CacheControlMaxAge']
     print(event['RequestType'])
     if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
-      
+
       if 'Substitutions' in event['ResourceProperties'].keys():
         temp_dir = os.path.join(tempfile.mkdtemp(), context.aws_request_id)
         apply_substitutions(event['ResourceProperties']['Substitutions'], temp_dir)
@@ -47,6 +47,8 @@ def upload(lambda_src, target_bucket, acl, cacheControl):
         source_file_path = os.path.join(folder, filename)
         destination_s3_key = os.path.relpath(source_file_path, lambda_src)
         contentType, encoding = mimetypes.guess_type(source_file_path)
+        if contentType is None:
+          contentType = 'application/octet-stream'
         upload_file(source_file_path, target_bucket,
                     destination_s3_key, s3, acl, cacheControl, contentType)
 
